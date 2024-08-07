@@ -161,7 +161,7 @@ class AllJobs extends Component {
   onGetInputOption = event => {
     const {checkboxInputs} = this.state
     const inputNotInList = checkboxInputs.filter(
-      eachItem => eachItem === event.target.id,
+      eachItem => eachItem.locationID === event.target.id,
     )
     if (inputNotInList.length === 0) {
       this.setState(
@@ -172,11 +172,35 @@ class AllJobs extends Component {
       )
     } else {
       const filteredData = checkboxInputs.filter(
-        eachItem => eachItem !== event.target.id,
+        eachItem => eachItem.locationID !== event.target.id,
       )
       this.setState(
         // eslint-disable-next-line no-unused-vars
         prevState => ({checkboxInputs: filteredData}),
+        this.onGetJobDetails,
+      )
+    }
+  }
+
+  onGetLocationOption = event => {
+    const {locationInput} = this.state
+    const locationNotInList = locationInput.filter(
+      eachItem => eachItem === event.target.id,
+    )
+    if (locationNotInList.length === 0) {
+      this.setState(
+        prevState => ({
+          locationInput: [...prevState.locationInput, event.target.id],
+        }),
+        this.onGetJobDetails,
+      )
+    } else {
+      const filteredData = locationInput.filter(
+        eachItem => eachItem !== event.target.id,
+      )
+      this.setState(
+        // eslint-disable-next-line no-unused-vars
+        prevState => ({locationInput: filteredData}),
         this.onGetJobDetails,
       )
     }
@@ -315,12 +339,12 @@ class AllJobs extends Component {
   onGetLocationCheckBoxesView = () => (
     <ul className="check-boxes-container">
       {locationList.map(eachItem => (
-        <li className="  \ " key={eachItem.locationID}>
+        <li className="li-container" key={eachItem.locationID}>
           <input
             className="input"
             id={eachItem.locationID}
             type="checkbox"
-            onChange={this.onGetLanguageOption}
+            onChange={this.onGetLocationOption}
           />
           <label className="label" htmlFor={eachItem.locationID}>
             {eachItem.label}
