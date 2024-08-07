@@ -44,6 +44,17 @@ const salaryRangesList = [
   },
 ]
 
+const locationList = [
+  {
+    locationID: 'DELHI',
+    label: 'Delhi',
+  },
+  {locationID: 'BANGALORE', label: 'Bangalore'},
+  {locationID: 'HYDERABAD', label: 'Hyderabad'},
+  {locationID: 'CHENNAI', label: 'Chennai'},
+  {locationID: 'MUMBAI', label: 'Mumbai'},
+]
+
 const apiStatusConstants = {
   initial: 'INITIAL',
   success: 'SUCCESS',
@@ -67,6 +78,7 @@ class AllJobs extends Component {
     jobsData: [],
     checkboxInputs: [],
     radioInput: '',
+    locationInput: [],
     searchInput: '',
     apiStatus: apiStatusConstants.initial,
     apiJobsStatus: apiJobsStatusConstants.initial,
@@ -81,7 +93,7 @@ class AllJobs extends Component {
     this.setState({apiStatus: apiStatusConstants.inProgress})
     const jwtToken = Cookies.get('jwt_token')
     // eslint-disable-next-line no-unused-vars
-    const {checkboxInputs, radioInput, searchInput} = this.state
+    const {checkboxInputs, radioInput, searchInput, locationInput} = this.state
     const profileApiUrl = 'https://apis.ccbp.in/profile'
     const optionsProfile = {
       headers: {
@@ -111,8 +123,8 @@ class AllJobs extends Component {
   onGetJobDetails = async () => {
     this.setState({apiJobsStatus: apiJobsStatusConstants.inProgress})
     const jwtToken = Cookies.get('jwt_token')
-    const {checkboxInputs, radioInput, searchInput} = this.state
-    const jobsApiUrl = `https://apis.ccbp.in/jobs?employment_type=${checkboxInputs}&minimum_package=${radioInput}&search=${searchInput}`
+    const {checkboxInputs, radioInput, searchInput, locationInput} = this.state
+    const jobsApiUrl = `https://apis.ccbp.in/jobs?employment_type=${checkboxInputs}&minimum_package=${radioInput}&search=${searchInput}&location=${locationInput}`
     const optionsJobs = {
       headers: {
         Authorization: `Bearer ${jwtToken}`,
@@ -132,6 +144,7 @@ class AllJobs extends Component {
         rating: eachItem.rating,
         title: eachItem.title,
       }))
+      // console.log([...new Set(updatedDataJobs.map(each => each.location))])
       this.setState({
         jobsData: updatedDataJobs,
         apiJobsStatus: apiJobsStatusConstants.success,
@@ -201,7 +214,7 @@ class AllJobs extends Component {
   )
 
   renderLoadingView = () => (
-    <div className="loader-container" testid="loader">
+    <div className="loader-container" data-testid="loader">
       <Loader type="ThreeDots" color="#0b69ff" height="50" width="50" />
     </div>
   )
@@ -299,6 +312,24 @@ class AllJobs extends Component {
     </ul>
   )
 
+  onGetLocationCheckBoxesView = () => (
+    <ul className="check-boxes-container">
+      {locationList.map(eachItem => (
+        <li className="  \ " key={eachItem.locationID}>
+          <input
+            className="input"
+            id={eachItem.locationID}
+            type="checkbox"
+            onChange={this.onGetLanguageOption}
+          />
+          <label className="label" htmlFor={eachItem.locationID}>
+            {eachItem.label}
+          </label>
+        </li>
+      ))}
+    </ul>
+  )
+
   onGetRadioButtonsView = () => (
     <ul className="radio-button-container">
       {salaryRangesList.map(eachItem => (
@@ -347,6 +378,9 @@ class AllJobs extends Component {
             <hr className="hr-line" />
             <h1 className="text">Salary Range</h1>
             {this.onGetRadioButtonsView()}
+            <hr className="hr-line" />
+            <h1 className="text">Location</h1>
+            {this.onGetLocationCheckBoxesView()}
           </div>
           <div className="jobs-container">
             <div>
@@ -359,11 +393,12 @@ class AllJobs extends Component {
                 onKeyDown={this.onEnterSearchInput}
               />
               <button
-                testid="searchButton"
                 type="button"
                 className="search-button"
                 onClick={this.onSubmitSearchInput}
+                data-testid="searchButton"
               >
+                {' '}
                 <AiOutlineSearch className="search-icon" />
               </button>
             </div>
